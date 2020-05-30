@@ -93,3 +93,10 @@ int max_flow(int _src, int _sink){
     }
     return ret;
 }
+
+///flow with demand(lower bound)
+//create new src and sink
+//add_edge(new src, u, sum(in_demand[u]))
+//add_edge(u, new sink, sum(out_demand[u]))
+//add_edge(old sink, old src, inf)
+//flow in every edge i = demand[i] + e.flow
