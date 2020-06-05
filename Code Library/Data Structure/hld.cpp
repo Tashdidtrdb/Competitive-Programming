@@ -27,8 +27,12 @@ const int MAX = 1e5 + 5, MOD = 1e9 + 7  , MAXLG = log2(MAX)+1;
 const ll inf = 1e18 + 5;
 
 //hld
+int arr[MAX];
+int n;
 vector<int> parent, depth, heavy, head, pos;
-int cur_pos;
+int cur_pos, sub[MAX];
+int tree[4*MAX];
+vii g[MAX];
 
 void update(int now, int L, int R, int idx, int val){
     if(L == R){
@@ -48,55 +52,52 @@ ll segtree_query(int now, int L, int R, int i, int j){
     return segtree_query(now<<1, L, mid, i, j) + segtree_query( (now<<1) | 1, mid+1, R, i, j);
 }
 
-int dfs(int v, vector<vector<int>> const& adj) {
-    int size = 1;
-    int max_c_size = 0;
-    for (int c : adj[v]) {
-        if (c != parent[v]) {
-            parent[c] = v, depth[c] = depth[v] + 1;
-            int c_size = dfs(c, adj);
-            size += c_size;
-            if (c_size > max_c_size)
-                max_c_size = c_size, heavy[v] = c;
+int dfs(int u) {
+    sub[u] = 1;
+    int mx_size = 0;
+    for (int v : g[u]) {
+        if (v != parent[u]) {
+            parent[v] = u, depth[v] = depth[u] + 1;
+            int v_size = dfs(v);
+            sub[u] += v_size;
+            if (v_size > mx_size){
+                mx_size = v_size;
+                heavy[u] = v;
+            }
         }
     }
-    return size;
+    return sub[u];
 }
 
-int decompose(int v, int h, vector<vector<int>> const& adj) {
-    head[v] = h, pos[v] = cur_pos++;
-    if (heavy[v] != -1)
-        decompose(heavy[v], h, adj);
-    for (int c : adj[v]) {
-        if (c != parent[v] && c != heavy[v])
-            decompose(c, c, adj);
+void decompose(int u, int h) {
+    head[u] = h, pos[u] = cur_pos++;
+    if (heavy[u] != -1) decompose(heavy[u], h);
+    for (int v : g[u]) {
+        if (v != parent[u] && v != heavy[u]) decompose(v, v);
     }
 }
 
-void init(vector<vector<int>> const& adj) {
-    int n = adj.size();
-    parent = vector<int>(n);
+void init(int n) {
+    parent = vector<int>(n, -1);
     depth = vector<int>(n);
     heavy = vector<int>(n, -1);
     head = vector<int>(n);
     pos = vector<int>(n);
-    cur_pos = 0;
+    cur_pos = 1;
 
-    dfs(0, adj);
-    decompose(0, 0, adj);
+    dfs(1);
+    decompose(1, 1);
 }
 
-int query(int a, int b) {
-    int res = 0;
+ll query(int a, int b) {
+    ll res = 0;
     for (; head[a] != head[b]; b = parent[head[b]]) {
-        if (depth[head[a]] > depth[head[b]])
-            swap(a, b);
-        int cur_heavy_path_max = segment_tree_query(pos[head[b]], pos[b]);
-        res = max(res, cur_heavy_path_max);
+        if (depth[head[a]] > depth[head[b]]) swap(a, b);
+        ll cur_heavy_path_res = segtree_query(1, 1, n, pos[head[b]], pos[b]);
+        res += cur_heavy_path_res;
     }
-    if (depth[a] > depth[b])
-        swap(a, b);
-    int last_heavy_path_max = segment_tree_query(pos[a], pos[b]);
-    res = max(res, last_heavy_path_max);
+    if (depth[a] > depth[b]) swap(a, b);
+    ll last_heavy_path_res = segtree_query(1, 1, n, pos[a], pos[b]);
+    res += last_heavy_path_res;
     return res;
 }
