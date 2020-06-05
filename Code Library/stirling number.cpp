@@ -45,12 +45,8 @@ ll stir(ll n, ll k){
     ll ret = 0;
     for(int i=0; i<=k; i++){
         ll v = ncr(k, i) * bigmod(i, n) % MOD;
-        if( (k-i)%2==0 ){
-            ret = (ret + v) % MOD;
-        }
-        else{
-            ret = (ret - v + MOD) % MOD;
-        }
+        if( (k-i)%2==0 ) ret = (ret + v) % MOD;
+        else ret = (ret - v + MOD) % MOD;
     }
     return ret;
 }
