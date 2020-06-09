@@ -41,8 +41,7 @@ struct simplehash{
         for (int i = 1; i <= len; i++) H[i] = (H[i - 1] * base + str[i - 1] + 1007) % mod;
         for (int i = len; i >= 1; i--) R[i] = (R[i + 1] * base + str[i - 1] + 1007) % mod;
     }
-
-
+    
     inline int range_hash(int l, int r){
         int hashval = H[r + 1] - ((long long)P[r - l + 1] * H[l] % mod);
         return (hashval < 0 ? hashval + mod : hashval);
