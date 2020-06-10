@@ -27,90 +27,64 @@ const int MAX = 1e5 + 5, MOD = 1e9 + 7  , MAXLG = log2(MAX)+1;
 const ll inf = 1e18 + 5;
 
 //fft
-struct complx{
-    long double real, img;
+typedef complex<double> base;
 
-    inline complx(){
-        real = img = 0.0;
+void fft(vector<base> & a, bool invert) {
+    int n = (int)a.size();
+
+    for (int i = 1, j = 0; i<n; ++i) {
+        int bit = n >> 1;
+        for (; j >= bit; bit >>= 1)j -= bit;
+        j += bit;
+        if (i < j)swap(a[i], a[j]);
     }
 
-    inline complx(long double x){
-        real = x, img = 0.0;
-    }
-
-    inline complx(long double x, long double y){
-        real = x, img = y;
-    }
-
-    inline void operator += (complx &other){
-        real += other.real, img += other.img;
-    }
-
-    inline void operator -= (complx &other){
-        real -= other.real, img -= other.img;
-    }
-
-    inline complx operator + (complx &other){
-        return complx(real + other.real, img + other.img);
-    }
-
-    inline complx operator - (complx &other){
-        return complx(real - other.real, img - other.img);
-    }
-
-    inline complx operator * (complx& other){
-        return complx((real * other.real) - (img * other.img), (real * other.img) + (img * other.real));
-    }
-};
-
-
-void FFT(vector <complx> &ar, int n, int inv){
-    int i, j, l, len, len2;
-    const long double p = 4.0 * inv * acos(0.0);
-
-    for (i = 1, j = 0; i < n; i++){
-        for (l = n >> 1; j >= l; l >>= 1) j -= l;
-        j += l;
-        if (i < j) swap(ar[i], ar[j]);
-    }
-
-    for(len = 2; len <= n; len <<= 1) {
-        long double ang = 2 * PI / len * inv;
-        complx wlen(cos(ang), sin(ang));
-        for(i = 0; i < n; i += len) {
-            complx w(1);
-            for(j = 0; j < len / 2; j++) {
-                complx u = ar[i + j];
-                complx v = ar[i + j + len / 2] * w;
-                ar[i + j] = u + v;
-                ar[i + j + len / 2] = u - v;
-                w = w * wlen;
+    for (int len = 2; len <= n; len <<= 1) {
+        double ang = 2 * PI / len * (invert ? -1 : 1);
+        base wlen(cos(ang), sin(ang));
+        for (int i = 0; i<n; i += len) {
+            base w(1);
+            for (int j = 0; j<len / 2; ++j) {
+                base u = a[i + j], v = a[i + j + len / 2] * w;
+                a[i + j] = u + v;
+                a[i + j + len / 2] = u - v;
+                w *= wlen;
             }
         }
     }
-
-    if (inv == -1){
-        long double tmp = 1.0 / n;
-        for (i = 0; i < n; i++) ar[i].real *= tmp;
-    }
+    if (invert) for (int i = 0; i<n; ++i) a[i] /= n;
 }
 
-
-vector <complx> Mul(const vector <complx> &x, const vector <complx> &y) {
+vector<ll> Mul(vector<ll>& a, vector<ll>& b){
+    vector<base> fa(a.begin(), a.end()), fb(b.begin(), b.end());
     int n = 1;
-    while(n <= x.size() + y.size()) n = n * 2;
-    vector <complx> A(n), B(n);
-    for(int i=0; i<x.size(); i++) A[i] = x[i];
-    for(int i=0; i<y.size(); i++) B[i] = y[i];
-    FFT(A, n, 1);
-    FFT(B, n, 1);
-    for(int i=0; i<n; i++) A[i] = A[i] * B[i]; 
-    FFT(A, n, -1);
-    return A;
+    while (n < max(a.size(), b.size()))  n <<= 1;
+    n <<= 1;
+    fa.resize(n), fb.resize(n);
+
+    fft(fa, false), fft(fb, false);
+    for (int i = 0; i<n; ++i) fa[i] *= fb[i];
+    fft(fa, true);
+
+    vector<ll> res;
+    res.resize(n);
+    for (int i = 0; i<n; ++i) res[i] = round(fa[i].real());
+    return res;
 }
 
-void multiply(string a, string b){
-    vector<complx>v1,v2;
+vector<bool> fastexpo(vector<bool>v,int p){
+    vector<bool>ret({1});
+    while(p > 0){
+        if(p % 2 == 1) ret = Mul(ret,v);
+        p = p / 2;
+        v = Mul(v,v);
+    }
+    return ret;
+}
+
+///multiplying with sign
+vector<int> multiply(string a, string b){
+    vector<int>v1,v2;
 
     int sign = 0;
     if(a[0] == '-'){
@@ -123,26 +97,42 @@ void multiply(string a, string b){
     }
     for(int i = 0;i < a.size();i++){
         int d = a[i] - '0';
-        v1.push_back(complx(d));
+        v1.push_back(d);
     }
     for(int i = 0;i < b.size();i++){
         int d = b[i] - '0';
-        v2.push_back(complx(d));
+        v2.push_back(d);
     }
 
     reverse(v1.begin(), v1.end());
     reverse(v2.begin(), v2.end());
 
-    vector<complx>v = Mul(v1,v2);
+    vector<int>v = Mul(v1,v2);
 
     int carry = 0;
-    vector<int>answer;
+    vector<int>res;
     for(int i = 0;i < v.size();i++){
-        int temp = round(v[i].real);
+        int temp = v[i];
         temp += carry;
-        answer.push_back(temp % 10);
+        res.push_back(temp % 10);
         carry = temp/10;
     }
-    while(answer.size() > 1 and answer.back() == 0) answer.pop_back();
+    while(res.size() > 1 and res.back() == 0) res.pop_back();
     reverse(ans.begin(), ans.end());
+    return res;
+}
+
+int mark[1005];
+int main(){
+    int n , k;
+    cin >> n >> k;
+    vector<bool>v;
+    for(int i = 0;i < n;i++){
+        int c;
+        cin >> c;
+        mark[c] = 1;
+    }
+    for(int i = 0;i <= 1000;i++) v.push_back(mark[i]);
+    vector<bool>ret = fastexpo(v,k);
+    for(int i = 0;i < ret.size();i++) if(ret[i] > 0) cout << i << ' ';
 }
