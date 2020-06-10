@@ -34,9 +34,9 @@ void fft(vector<base> & a, bool invert) {
 
     for (int i = 1, j = 0; i<n; ++i) {
         int bit = n >> 1;
-        for (; j >= bit; bit >>= 1)j -= bit;
+        for (; j >= bit; bit >>= 1) j -= bit;
         j += bit;
-        if (i < j)swap(a[i], a[j]);
+        if (i < j) swap(a[i], a[j]);
     }
 
     for (int len = 2; len <= n; len <<= 1) {
