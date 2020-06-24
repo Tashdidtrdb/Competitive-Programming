@@ -27,7 +27,7 @@ using namespace std;
 const int MAX = 1e5 + 5, MOD = 1e9 + 7  , MAXLG = log2(MAX)+1;
 const ll inf = 1e18 + 5;
 
-struct linear_recurrence_berlekamp_massey {
+struct berlekamp_massey { // for linear recursion
         typedef long long LL;
         static const int SZ = 2e5 + 5;
         static const int MOD = 1e9 + 7; /// mod must be a prime
@@ -104,7 +104,7 @@ struct linear_recurrence_berlekamp_massey {
  
 vector <int> graph[ N ];
  
-LL RDB_generator(int level) {
+LL RDB_generator(int level) { // bruteforce to find the ans for some first cases
     for (int i = 0; i < N; i++) graph[i].clear();
     vector <int> nodes;
  
