@@ -42,8 +42,7 @@ int NOD(int N){
             val=sqrt(N)+1;
         }
     }
-    if(N>1)
-    sum=sum*2;
+    if(N>1) sum=sum*2;
     return sum;
 }
 
@@ -55,8 +54,7 @@ int SOD(int N){
     for(i=0;primes[i]<val;i++){
         if(N%primes[i]==0){
             p=1;
-            while(N%primes[i]==0)
-                {
+            while(N%primes[i]==0){
                 N/=primes[i];
                 p=p*primes[i];
             }
@@ -93,9 +91,7 @@ void NOD_n(){
                 break;
             }
         }
-        if(M==N){
-            D[N]=2;
-        }
+        if(M==N) D[N]=2;
     }
 }
 

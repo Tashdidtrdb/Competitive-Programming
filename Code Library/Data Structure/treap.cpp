@@ -30,9 +30,10 @@ const ll inf = 1e18 + 5;
 mt19937 rnd(chrono::steady_clock::now().time_since_epoch().count());
 typedef struct node* pnode;
 struct node{
-    int prior, val, sz;
+    int prior, val, sz
+    ll sum;
     node *lft, *rt;
-    node(int val = 0, node *lft = NULL, node *rt = NULL) : lft(lft), rt(rt), prior(rnd()), val(val), sz(1) {}
+    node(int val = 0, node *lft = NULL, node *rt = NULL) : lft(lft), rt(rt), prior(rnd()), val(val), sz(1), sum(0) {}
 };
 
 struct treap{
@@ -50,6 +51,15 @@ struct treap{
         now->sz = 1 + get_sz(now->lft) + get_sz(now->rt);
     }
 
+    ll get(pnode now){
+        return now ? now->sum : 0;
+    }
+
+    void combine(pnode now){
+        if(!now) return;
+        now->sum = now->val + get(now->lft) + get(now->rt);
+    }
+
     pnode unite(pnode lft, pnode rt){
         if(!lft || !rt) return lft ? lft : rt;
         if(lft->prior < rt->prior) swap(lft, rt);
@@ -65,19 +75,21 @@ struct treap{
         if(!now) return void(lft = rt = NULL);
         if(now->val < val) split(now->rt, now->rt, rt, val), lft = now;
         else split(now->lft, lft, now->lft, val), rt = now;
+        update_sz(now), combine(now);
     }
 
     void merge(pnode &now, pnode lft, pnode rt){
         if(!lft || !rt) now = lft ? lft : rt;
         else if(lft->prior > rt->prior) merge(lft->rt, lft->rt, rt), now = lft;
         else merge(rt->lft, lft, rt->lft), now = rt;
+        update_sz(now), combine(now);
     }
 
     void insert(pnode &now, pnode notun){
         if(!now) now = notun;
         else if(notun->prior > now->prior) split(now, notun->lft, notun->rt, notun->val), now = notun;
         else insert(notun->val < now->val ? now->lft : now->rt, notun);
-        update_sz(now);
+        update_sz(now), combine(now);
     }
 
     void erase(pnode &now, int val){
@@ -87,7 +99,7 @@ struct treap{
             delete(temp);
         }
         else erase(val < now->val ? now->lft : now->rt, val);
-        update_sz(now);
+        update_sz(now), combine(now);
     }
 
     int get_idx(pnode &now, int val){
@@ -102,6 +114,13 @@ struct treap{
         if(get_sz(now->lft) + 1 == k) return now->val;
         if(k <= get_sz(now->lft)) return find_kth(now->lft, k);
         return find_kth(now->rt, k - get_sz(now->lft) - 1);
+    }
+
+    ll prefix_sum(pnode &now, int k){
+        if(k < 1 || k > get_sz(now)) return -inf;
+        if(get_sz(now->lft) + 1 == k) return get(now->lft) + now->val;    
+        if(k <= get_sz(now->lft)) return prefix_sum(now->lft, k);
+        return get(now->lft) + now->val + prefix_sum(now->rt, k - get_sz(now->lft) - 1);
     }
 
     pnode get_rng(int l, int r){ ///gets all l <= values <= r
