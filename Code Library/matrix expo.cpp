@@ -47,12 +47,8 @@ struct matrix{
     }
 };
 
+// make sure a.m == b.n
 matrix operator * (matrix &a, matrix &b){
-    if(a.m != b.n){
-        cout << "can't multiply\n";
-        return matrix(1,1);
-    }
-
     int n = a.n, m = b.m;
     matrix ret(n,m);
     for(int i=0; i<n; i++){
