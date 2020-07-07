@@ -27,6 +27,7 @@ const int MAX = 1e5 + 5, MOD = 1e9 + 7  , MAXLG = log2(MAX)+1;
 const ll inf = 1e18 + 5;
 
 //min cost maxflow
+mt19937 rnd(chrono::steady_clock::now().time_since_epoch().count());
 struct edge{
     int v, rev;
     ll cap, cost, flow;
@@ -36,7 +37,7 @@ struct edge{
 
 struct mcmf{
     int src, sink, nodes;
-    vector<int> par, idx;
+    vector<int> par, idx, Q;
     vector<bool> inq; 
     vector<ll> dis;
     vector<vector<edge>> g;
@@ -44,7 +45,7 @@ struct mcmf{
     mcmf(){}
     mcmf(int src, int sink, int nodes) : src(src), sink(sink), nodes(nodes), 
                                          par(nodes), idx(nodes), inq(nodes), 
-                                         dis(nodes), g(nodes){}
+                                         dis(nodes), g(nodes), Q(10000005){}
 
     void add_edge(int u, int v, ll cap, ll cost, bool directed = true){
         edge _u = edge(v, g[v].size(), cap, cost);
@@ -59,23 +60,25 @@ struct mcmf{
             dis[i] = inf, inq[i] = false;
         }
 
-        queue<int>q;
-        q.push(src);
-        dis[src] = 0, par[src] = -1, inq[src] = true;
-        while(!q.empty()){
-            int u = q.front(); q.pop();
-            inq[u] = false;
+        int f = 0, l = 0;
+        dis[src] = 0, par[src] = -1, Q[l++] = src, inq[src] = true;
+        while(f < l){
+            int u = Q[f++];
             for(int i = 0; i < g[u].size(); i++){
                 edge &e = g[u][i];
                 if(e.cap <= e.flow) continue;
                 if(dis[e.v] > dis[u] + e.cost){
                     dis[e.v] = dis[u] + e.cost;
                     par[e.v] = u, idx[e.v] = i;
-                    if(!inq[e.v]) inq[e.v] = true, q.push(e.v);
+                    if(!inq[e.v]){
+                        inq[e.v] = true;
+                        if(f && rnd() & 7) Q[--f] = e.v;
+                        else Q[l++] = e.v;
+                    }
                 }
             }
+            inq[u] = false;
         }
-
         return (dis[sink] != inf);
     }
 
@@ -87,16 +90,13 @@ struct mcmf{
                 edge &e = g[u][v];
                 bottleneck = min(bottleneck, e.cap - e.flow);
             }
-
             for(int u = par[sink], v = idx[sink]; u != -1; v = idx[u], u = par[u]){
                 edge &e = g[u][v];
                 e.flow += bottleneck;
                 g[e.v][e.rev].flow -= bottleneck;
             }
-
             mincost += bottleneck * dis[sink], maxflow += bottleneck;
         }
-
         return make_pair(mincost, maxflow);
     }
 };
