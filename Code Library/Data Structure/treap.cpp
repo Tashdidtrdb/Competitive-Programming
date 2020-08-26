@@ -65,8 +65,9 @@ struct treap{
         if(lft->prior < rt->prior) swap(lft, rt);
         pnode l,r;
         split(rt, l, r, lft->val);
-        lft->lft = unite(lft->lft, l);
-        lft->rt = unite(lft->rt, r);
+        lft->lft = unite(lft->lft, l), update_sz(lft);
+        lft->rt = unite(lft->rt, r), update_sz(lft);
+        // combine(lft); this line idk if correct...need to check while solving
         return lft;
     }
 
