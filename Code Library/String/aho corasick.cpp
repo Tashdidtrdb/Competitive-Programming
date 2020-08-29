@@ -73,13 +73,67 @@ inline void push_link(){
             }
             else aho[cur].next[c] = aho[link].next[c];
         }
+        aho[cur].val += aho[link].val;
     }
 }
 
-ll dp[MAX];
-///returns sum(val) of all strings ending at given position
-ll get_val(int now){
-    if(!now) return 0;
-    if(dp[now] != -1) return dp[now];
-    return dp[now] = aho[now].val + get_val(aho[now].next_lif);
+inline int count(string &s){
+    int now = 0, ret = 0;
+    for(int i=0; i<s.size(); i++){
+        now = aho[now].next[s[i] - 'a'];
+        ret += aho[now].val;
+    }
+    return ret;
+}
+
+struct dynamic_aho{
+    aho_corasick ac[20];
+    vector<string> dict[20];
+    dynamic_aho(){
+        for(int i=0; i<20; i++){
+            ac[i].aho.clear();
+            dict[i].clear();
+        }
+    }
+
+    void add_str(string &s){
+        int idx = 0;
+        for(; idx < 20 && !ac[idx].aho.empty(); idx++){}
+
+        ac[idx] = aho_corasick();
+        ac[idx].add_str(s,1), dict[idx].pb(s);
+        for(int i=0; i<idx; i++){
+            for(string x: dict[i]){
+                ac[idx].add_str(x,1);
+                dict[idx].pb(x);
+            }
+            ac[i].aho.clear(), dict[i].clear();
+        }
+        ac[idx].push_link();
+    }
+
+    inline int count(string &s){
+        int ret = 0;
+        for(int i=0; i<20; i++){
+            if(!ac[i].aho.empty()) ret += ac[i].count(s);
+        }
+        return ret;
+    }
+};
+
+int arr[MAX];
+int main(){
+ 
+    fastio;
+    dynamic_aho add, del;
+    int m;
+    cin >> m;
+    while(m--){
+        int type;
+        string s;
+        cin >> type >> s;
+        if(type == 1) add.add_str(s);
+        else if(type == 2) del.add_str(s);
+        else cout << add.count(s) - del.count(s) << "\n" << flush;
+    }
 }

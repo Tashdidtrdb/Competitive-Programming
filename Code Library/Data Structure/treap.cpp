@@ -62,17 +62,19 @@ struct treap{
 
     pnode unite(pnode lft, pnode rt){
         if(!lft || !rt) return lft ? lft : rt;
+        // push(lft), push(rt); this not tested
         if(lft->prior < rt->prior) swap(lft, rt);
         pnode l,r;
         split(rt, l, r, lft->val);
         lft->lft = unite(lft->lft, l), update_sz(lft);
         lft->rt = unite(lft->rt, r), update_sz(lft);
-        // combine(lft); this line idk if correct...need to check while solving
+        // combine(lft); this not tested
         return lft;
     }
 
     ///value < val goes to left, value >= val goes to right
     void split(pnode now, pnode &lft, pnode &rt, int val, int add = 0){
+        push(now);
         if(!now) return void(lft = rt = NULL);
         if(now->val < val) split(now->rt, now->rt, rt, val), lft = now;
         else split(now->lft, lft, now->lft, val), rt = now;
@@ -80,6 +82,7 @@ struct treap{
     }
 
     void merge(pnode &now, pnode lft, pnode rt){
+        push(lft), push(rt);
         if(!lft || !rt) now = lft ? lft : rt;
         else if(lft->prior > rt->prior) merge(lft->rt, lft->rt, rt), now = lft;
         else merge(rt->lft, lft, rt->lft), now = rt;
@@ -88,12 +91,14 @@ struct treap{
 
     void insert(pnode &now, pnode notun){
         if(!now) now = notun;
+        push(now);
         else if(notun->prior > now->prior) split(now, notun->lft, notun->rt, notun->val), now = notun;
         else insert(notun->val < now->val ? now->lft : now->rt, notun);
         update_sz(now), combine(now);
     }
 
     void erase(pnode &now, int val){
+        push(now);
         if(now->val == val){
             pnode temp = now;
             merge(now, now->lft, now->rt);
