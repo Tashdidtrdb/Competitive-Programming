@@ -84,10 +84,10 @@ struct stringhash{
     }
 
     inline long long concat_range_hash(int l1, int r1, int l2, int r2){
-        return ((long long)sh1.concat_range_Hash(l1, r1, l2, r2) << 32) ^ sh2.concat_range_Hash(l1, r1, l2, r2);
+        return ((long long)sh1.concat_range_hash(l1, r1, l2, r2) << 32) ^ sh2.concat_range_hash(l1, r1, l2, r2);
     }
 
     inline long long concat_reverse_hash(int l1, int r1, int l2, int r2){
-        return ((long long)sh1.concat_reverse_Hash(l1, r1, l2, r2) << 32) ^ sh2.concat_reverse_Hash(l1, r1, l2, r2);
+        return ((long long)sh1.concat_reverse_hash(l1, r1, l2, r2) << 32) ^ sh2.concat_reverse_hash(l1, r1, l2, r2);
     }
 };
