@@ -82,6 +82,12 @@ void sa_extend(char c) {
     last = cur;
 }
 
+void radix_sort(){
+    for(int i=0; i<sz; i++) cnt[st[i].len]++;
+    for(int i=1; i<sz; i++) cnt[i] += cnt[i-1];
+    for(int i=0; i<sz; i++) order[--cnt[st[i].len]] = i;
+}
+
 // after constructing the automaton
 for (int v = 1; v < sz; v++) {
     st[st[v].link].inv_link.push_back(v);
