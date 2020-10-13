@@ -56,13 +56,13 @@ ll solve(int st, int ed){ ///recursive
 }
 
 ///iterative
-for(int i=1; i<=m+1; i++){
+for(int i=1; i<=n; i++){
     path[i][i] = i;
     dp[i][i] = 0;
 }
 
-for(int len = 2; len <= m+1; len++){
-    for(int st = 1; st + len - 1 <= m+1; st++){
+for(int len = 2; len <= n; len++){
+    for(int st = 1; st + len - 1 <= n; st++){
         int ed = st + len - 1;
         int L = max(st, path[st][ed-1]);
         int R = min(ed-1, path[st+1][ed]);
@@ -76,4 +76,4 @@ for(int len = 2; len <= m+1; len++){
         }
     }
 }
-cout<<dp[1][m+1]<<"\n";
+cout<<dp[1][n]<<"\n";
