@@ -61,6 +61,23 @@ ll bigmod ( ll a, ll p, ll m){
 }
 
 //precalc fact
-fact[0] = inv_fact[0] = inv_fact[1] = 1;
-for(int i=1; i<MAX; i++) fact[i] = ((fact[i-1] % MOD) * ((ll)i % MOD)) % MOD;
-for(int i=2; i<MAX; i++) inv_fact[i] = ((inv_fact[i-1] % MOD) * ( invmod((ll)i,MOD)) ) % MOD;
+void precalc(){
+    fact[0] = inv_fact[0] = inv_fact[1] = 1;
+    for(int i=1; i<MAX; i++) fact[i] = ((fact[i-1] % MOD) * ((ll)i % MOD)) % MOD;
+    for(int i=2; i<MAX; i++) inv_fact[i] = ((inv_fact[i-1] % MOD) * ( invmod((ll)i,MOD)) ) % MOD;
+}
+
+ll ncr(ll n, ll r){
+    if(n < r) return 0;
+    ll ret = fact[n];
+    ret = (ret * inv_fact[n-r]) % MOD;
+    ret = (ret * inv_fact[r]) % MOD;
+    return ret;
+}
+
+ll npr(ll n, ll r){
+    if(n < r) return 0;
+    ll ret = fact[n];
+    ret = (ret * inv_fact[n-r]) % MOD;
+    return ret;
+}
