@@ -38,11 +38,11 @@ const ll root = 121532577;
 const ll inv_root = 100122727;
 const ll limit = 1 << 22;
 
-ll mulmod(ll u, ll v, ll m){
+ll mulmod(ll u, ll v, ll m) {
     return ((u * v - (ll)((long double)u / m * v + 1e-8) * m) % m + m) % m; //don't know how tf this works
 }
 
-ll bigmod ( ll a, ll p, ll m){
+ll bigmod (ll a, ll p, ll m) {
     ll res = 1 % m;
     ll x = a % m;
     while(p){
@@ -90,7 +90,7 @@ vector<ll> Mul(vector<ll>& a, vector<ll>& b){
     fa.resize(n), fb.resize(n);
 
     ntt(fa, false), ntt(fb, false);
-    for (int i = 0; i<n; ++i) fa[i] *= fb[i];
+    for (int i = 0; i<n; ++i) fa[i] = (fa[i] * fb[i]) % mod;
     ntt(fa, true);
 
     vector<ll> res;

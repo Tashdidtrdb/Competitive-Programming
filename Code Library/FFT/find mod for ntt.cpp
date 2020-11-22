@@ -83,10 +83,7 @@ bool ptest(ll n) { // miller-rabin primality test
     return true;
 }
 
-int arr[MAX];
-int main(){
-
-    fastio;
+void get_mod() {
     // need to find mod = c * 2^k + 1 where mod is a prime
     // then find a generator g of mod, then root = g^k
     ll limit = (1ll << 35); // k = 35
@@ -105,4 +102,34 @@ int main(){
     ll inv_root = bigmod(root, mod-2, mod);
     cout << root << "\n";
     cout << inv_root << "\n";
+}
+
+void find_roots(ll mod) {
+    if(!ptest(mod)) {
+        cout << -1 << "\n";
+        return;
+    }
+    ll p = 2, k = 1;
+    ll root = -1, inv_root = -1;
+    for( ; p <= mod; p <<= 1, k++) {
+        if( !((mod - 1) % p) ) {
+            ll c = (mod - 1) / p;
+            cout << c << " * " << 2 << " ^ " << k << " = " << p << "\n";
+            ll g = generator(mod);
+            if(g == -1) continue;
+            ll root = bigmod(g,k,mod);
+            ll inv_root = bigmod(root, mod-2, mod);
+            cout << "root = " << root << "\n";
+            cout << "inv_root = " << inv_root << "\n";
+
+            cout << "\n";
+        }
+    }
+}
+
+int arr[MAX];
+int main(){
+
+    fastio;
+
 }
