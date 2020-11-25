@@ -27,4 +27,3 @@ double adaptive_simpson(double minx, double maxx, double EPS)
     return adaptive_simpson(minx, maxx, simpson(minx, maxx, i), EPS);
 }
 
-// test
