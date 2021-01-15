@@ -117,6 +117,12 @@ struct LinkCut : SplayTree {
     T[v].p = u, pull(u);
   }
 
+  void cut(int u) {
+    access(u);
+    T[u].ch[0] = T[ T[u].ch[0] ].p = 0;
+    pull(u);
+  }
+
   void cut(int u, int v) {
     make_root(u), access(v);
     T[v].ch[0] = T[u].p = 0, pull(v);
