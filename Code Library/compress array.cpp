@@ -24,7 +24,7 @@ const ll inf = 1e18 + 5;
 
 //compress array
 void compress(int n) {
-  vii v;
+  vector<int> v;
   for (int i = 0; i < n; i++) v.pb(arr[i]);
   sort(v.begin(), v.end());
   v.erase(unique(v.begin(), v.end()), v.end());

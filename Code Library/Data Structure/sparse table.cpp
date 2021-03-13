@@ -22,38 +22,35 @@ using namespace std;
 const int MAX = 2e5 + 5, MOD = 1e9 + 7;
 const ll inf = 1e18 + 5;
 
-struct SparseTable {
-  int lg[35];
-  int dp[MAX];
+int lg[MAX];
+int dp[MAX][35];
 
-  SparseTable() {}
-  SparseTable(int n, int arr[]) {
-    for (int i = 0; i <= n + 5; i++) lg[i] = lg[i / 2] + 1;
-    for (int i = 1; i <= n + 1; i++) dp[i][0] = arr[i];
-    for (int j = 1; j < 25; j++) {
-      for (int i = 1; i <= n + 1; i++) {
-        dp[i][j] = __gcd(dp[i][j - 1], dp[i + (1 << (j - 1))][j - 1]);
-      }
+void init(int n, int arr[]) {
+  for (int i = 0; i <= n + 5; i++) lg[i] = lg[i / 2] + 1;
+  for (int i = 1; i <= n + 1; i++) dp[i][0] = arr[i];
+  for (int j = 1; j < 25; j++) {
+    for (int i = 1; i + (1 << j) <= n + 1; i++) {
+      dp[i][j] = __gcd(dp[i][j - 1], dp[i + (1 << (j - 1))][j - 1]);
     }
   }
+}
 
-  int get_min(int L, int R) {
-    int len = R - L + 1;
-    int p = lg[len];
-    return min(dp[L[j]], dp[R - (1 << p) + 1][p]);
-  }
+int get_min(int L, int R) {
+  int len = R - L + 1;
+  int p = lg[len];
+  return min(dp[L][p], dp[R - (1 << p) + 1][p]);
+}
 
-  int get_sum(int L, int R) {
-    int sum = 0;
-    for (int j = 25; j >= 0; j--) {
-      if ((1 << j) <= R - L + 1) {
-        sum += dp[L][j];
-        L += (1 << j);
-      }
+int get_sum(int L, int R) {
+  int sum = 0;
+  for (int j = 25; j >= 0; j--) {
+    if ((1 << j) <= R - L + 1) {
+      sum += dp[L][j];
+      L += (1 << j);
     }
-    return sum;
   }
-};
+  return sum;
+}
 
 int arr[MAX];
 int main() {
