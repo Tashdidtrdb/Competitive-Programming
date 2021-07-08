@@ -39,10 +39,10 @@ void build(int now, int L, int R) {
 
 void push(int now, int L, int R) {
   if (lazy[now]) {
-    sum[now] = (R - L + 1) * lazy[now];
+    sum[now] += (R - L + 1) * lazy[now];
     if (L != R) {
-      lazy[(now) << 1] ^= lazy[now];
-      lazy[(now << 1) | 1] ^= lazy[now];
+      lazy[(now) << 1] += lazy[now];
+      lazy[(now << 1) | 1] += lazy[now];
     }
   }
   lazy[now] = 0;
