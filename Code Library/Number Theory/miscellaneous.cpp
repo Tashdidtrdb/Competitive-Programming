@@ -42,6 +42,20 @@ int NOD(int N) {
   return sum;
 }
 
+int NOD(int n) {
+  int ret = 1;
+  while (n > 1) {
+    int div = spf[n];
+    int cnt = 0;
+    while (!(n % div)) {
+      n /= div;
+      cnt++;
+    }
+    ret *= (cnt + 1);
+  }
+  return ret;
+}
+
 //sum of divisors
 int SOD(int N) {
   int i, val, c, sum, p, s;
@@ -66,6 +80,21 @@ int SOD(int N) {
     sum = sum * s;
   }
   return sum;
+}
+
+int SOD(int n) {
+  int ret = 1;
+  while (n > 1) {
+    int div = spf[n];
+    int p = 1;
+    while (!(n % div)) {
+      n /= div;
+      p *= div;
+    }
+    p *= div;
+    ret *= ((p - 1) / (div - 1));
+  }
+  return ret;
 }
 
 //Number of divisors upto N
