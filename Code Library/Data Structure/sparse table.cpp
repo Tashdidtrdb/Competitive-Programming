@@ -26,7 +26,7 @@ int lg[MAX];
 int dp[MAX][35];
 
 void init(int n, int arr[]) {
-  for (int i = 0; i <= n + 5; i++) lg[i] = lg[i / 2] + 1;
+  for (int i = 2; i <= n + 5; i++) lg[i] = lg[i / 2] + 1;
   for (int i = 1; i <= n + 1; i++) dp[i][0] = arr[i];
   for (int j = 1; j < 25; j++) {
     for (int i = 1; i + (1 << j) <= n + 1; i++) {
