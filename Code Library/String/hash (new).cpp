@@ -98,8 +98,8 @@ pll repeat(pll hash, int len, ll cnt) {
   mul = (mul % mod + mod) % mod;
   pll ret = (hash * mul) % mod;
 
-  if (P[len].ff == 1)    ret.ff = hash.ff * cnt;
-  if (P[len].ss == 1)    ret.ss = hash.ss * cnt;
+  if (P[len].ff == 1) ret.ff = hash.ff * cnt;
+  if (P[len].ss == 1) ret.ss = hash.ss * cnt;
   return ret;
 }
 
