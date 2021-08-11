@@ -38,5 +38,5 @@ int arr[MAX];
 int main() {
 
   fastio;
-
+  
 }

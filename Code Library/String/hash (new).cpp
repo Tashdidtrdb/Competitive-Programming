@@ -116,10 +116,11 @@ struct hashlist {
     len = (int)s.size();
     hash_init(len);
     H.resize(len + 1, pll(0, 0)), R.resize(len + 2, pll(0, 0));
-    for (int i = 1; i <= len; i++) H[i] = (H[i - 1] * base + s[i - 1] + 1007) % mod;
-    for (int i = len; i >= 1; i--) R[i] = (R[i + 1] * base + s[i - 1] + 1007) % mod;
+    for (int i = 1; i <= len; i++) H[i] = append(H[i - 1], s[i - 1]);
+    for (int i = len; i >= 1; i--) R[i] = append(R[i + 1], s[i - 1]);
   }
-
+  
+  /// 1-indexed
   pll range_hash(int l, int r) {
     int len = r - l + 1;
     return ((H[r] - H[l - 1] * P[len]) % mod + mod) % mod;

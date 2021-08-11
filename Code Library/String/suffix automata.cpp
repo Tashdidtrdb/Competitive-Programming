@@ -126,12 +126,12 @@ void add_str(string s) {
   for (int i = 0; i < sz; i++) mx[i] = 0;
   int v = 0, l = 0;
   for (int i = 0; i < s.size(); i++) {
-    while (v && !st[v].next[s[i] - 'a']) {
+    while (v && !st[v].next.count(s[i])) {
       v = st[v].link ;
       l = st[v].len ;
     }
-    if (st[v].next[s[i] - 'a']) {
-      v = st [v].next[s[i] - 'a'];
+    if (st[v].next.count(s[i])) {
+      v = st [v].next[s[i]];
       l++;
     }
     mx[v] = max(mx[v], l);
