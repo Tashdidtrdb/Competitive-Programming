@@ -121,22 +121,22 @@ struct hashlist {
   }
   
   /// 1-indexed
-  pll range_hash(int l, int r) {
+  inline pll range_hash(int l, int r) {
     int len = r - l + 1;
     return ((H[r] - H[l - 1] * P[len]) % mod + mod) % mod;
   }
 
-  pll reverse_hash(int l, int r) {
+  inline pll reverse_hash(int l, int r) {
     int len = r - l + 1;
     return ((R[l] - R[r + 1] * P[len]) % mod + mod) % mod;
   }
 
-  pll concat_range_hash(int l1, int r1, int l2, int r2) {
+  inline pll concat_range_hash(int l1, int r1, int l2, int r2) {
     int len_2 = r2 - l2 + 1;
     return concat(range_hash(l1, r1), range_hash(l2, r2), len_2);
   }
 
-  pll concat_reverse_hash(int l1, int r1, int l2, int r2) {
+  inline pll concat_reverse_hash(int l1, int r1, int l2, int r2) {
     int len_1 = r1 - l1 + 1;
     return concat(reverse_hash(l2, r2), reverse_hash(l1, r1), len_1);
   }
