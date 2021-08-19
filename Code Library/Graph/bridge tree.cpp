@@ -53,8 +53,7 @@ void bridge(int u, int p) {
   d[u] = low[u] = ++d_t;
 
   for (int i = 0; i < g[u].size(); i++) {
-    edge e = g[u][i];
-    int v = e.v;
+    edge e = g[u][i]; int v = e.v;
     if (v == p) continue;
     if (!vis[v]) {
       bridge(v, u);
@@ -68,17 +67,12 @@ void bridge(int u, int p) {
 }
 
 void make_tree(int node) {
-  int cur = comp;
-  id[node] = cur;
-  q[cur].push(node);
-  vis[node] = true;
-  id[node] = cur;
+  int cur = comp; q[cur].push(node);
+  vis[node] = true; id[node] = cur;
   while (!q[cur].empty()) {
-    int u = q[cur].front();
-    q[cur].pop();
+    int u = q[cur].front(); q[cur].pop();
     for (int i = 0; i < g[u].size(); i++) {
-      edge e = g[u][i];
-      int v = e.v;
+      edge e = g[u][i]; int v = e.v;
       if (vis[v]) continue;
       if (is_bridge[u][i]) {
         comp++;
@@ -87,8 +81,7 @@ void make_tree(int node) {
         make_tree(v);
       } else {
         q[cur].push(v);
-        vis[v] = true;
-        id[v] = cur;
+        vis[v] = true; id[v] = cur;
       }
     }
   }
