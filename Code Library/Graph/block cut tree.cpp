@@ -22,42 +22,47 @@ using namespace std;
 const int MAX = 2e5 + 5, MOD = 1e9 + 7;
 const ll inf = 1e18 + 5;
 
-//block cut tree
 bool ap[MAX];
 int id[MAX], koyta[MAX];
 int d[MAX], low[MAX];
 bool vis[MAX];
-vii g[MAX], tree[MAX];
-int d_t;
-stack<int>st;
+vector<int> g[MAX], tree[MAX];
+int d_t; stack<int>st;
 vector<vector<int>>comp;
+// vector<pii> bridges;
 
 void articulation(int u, int p) {
   vis[u] = true;
   d[u] = low[u] = ++d_t;
-  int child = 0;
-  st.push(u);
+  int child = 0; st.push(u);
   for (int v : g[u]) {
     if (v == p) continue;
     if (!vis[v]) {
-      child++;
-      articulation(v, u);
+      child++; articulation(v, u);
       low[u] = min(low[u], low[v]);
       if (p == -1 && child > 1) ap[u] = true;
-      if (low[v] >= d[u]) {
+      if (low[v] >= d[u]) { /// > for bridge
+        // bridges.pb({u,v});
         if (p != -1) ap[u] = true;
-        comp.pb({u});
-        int top;
+        comp.pb({u}); int top;
         do {
-          top = st.top();
-          st.pop();
+          top = st.top(); st.pop();
           comp.back().pb(top);
         } while (top != v);
       }
     } else low[u] = min(low[u], d[v]);
   }
+  /// for bridge component
+  // if (p == -1) {
+  //   comp.pb({});
+  //   while (!st.empty()) {
+  //     comp.back().pb(st.top());
+  //     st.pop();
+  //   }
+  // }
 }
 
+// block cut tree
 int node = 0;
 void make_tree(int n) {
   for (int i = 1; i <= n; i++) {
@@ -71,6 +76,22 @@ void make_tree(int n) {
       else id[u] = node, cnt++;
     }
     koyta[node] = cnt;
+  }
+}
+
+// bridge tree
+int node = 0;
+void make_tree() {
+  for (int i = 0; i < comp.size(); i++) {
+    ++node;
+    for (int u : comp[i]) id[u] = node;
+  }
+  for (pii p : bridges) {
+    int u = p.ff, v = p.ss;
+    if (id[u] != id[v]) {
+      tree[id[u]].pb(id[v]);
+      tree[id[v]].pb(id[u]);
+    }
   }
 }
 
