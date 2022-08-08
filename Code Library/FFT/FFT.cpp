@@ -38,17 +38,16 @@ than doing two ffts, but faster by about 30%.
 struct CD {
   double x, y;
   CD(double x = 0, double y = 0) : x(x), y(y) {}
-  CD operator+(const CD& o) { return {x + o.x, y + o.y};}
-  CD operator-(const CD& o) { return {x - o.x, y - o.y};}
-  CD operator*(const CD& o) { return {x * o.x - y * o.y, x * o.y + o.x * y};}
-  void operator /= (double d) { x /= d; y /= d;}
+  CD operator + (const CD& o) {return {x + o.x, y + o.y};}
+  CD operator - (const CD& o) {return {x - o.x, y - o.y};}
+  CD operator * (const CD& o) {return {x * o.x - y * o.y, x * o.y + o.x * y};}
+  void operator /= (double d) {x /= d; y /= d;}
   double real() {return x;}
   double imag() {return y;}
 };
 CD conj(const CD &c) {return CD(c.x, -c.y);}
 
 typedef long long LL;
-const double PI = acos(-1.0L);
 
 int N;
 vector<int> perm;
