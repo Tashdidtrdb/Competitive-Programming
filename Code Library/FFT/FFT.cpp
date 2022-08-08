@@ -40,7 +40,7 @@ struct CD {
   CD(double x = 0, double y = 0) : x(x), y(y) {}
   CD operator+(const CD& o) { return {x + o.x, y + o.y};}
   CD operator-(const CD& o) { return {x - o.x, y - o.y};}
-  CD operator*(const CD& o) { return {x*o.x - y * o.y, x*o.y + o.x * y};}
+  CD operator*(const CD& o) { return {x * o.x - y * o.y, x * o.y + o.x * y};}
   void operator /= (double d) { x /= d; y /= d;}
   double real() {return x;}
   double imag() {return y;}
