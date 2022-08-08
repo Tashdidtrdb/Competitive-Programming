@@ -22,76 +22,116 @@ using namespace std;
 const int MAX = 2e5 + 5, MOD = 1e9 + 7;
 const ll inf = 1e18 + 5;
 
-// use mulmod everywhere if these large values are used
-// const ll mod = 343459944726529;
-// const ll root = 285149939879053;
-// const ll inv_root = 73746282893527;
-// const ll limit = (1ll << 35);
+struct base {
+  double x, y;
+  base() { x = y = 0; }
+  base(double x, double y): x(x), y(y) { }
+};
 
-const ll mod = 163577857;
-const ll root = 121532577;
-const ll inv_root = 100122727;
-const ll limit = 1 << 22;
+inline base operator + (base a, base b) { return base(a.x + b.x, a.y + b.y); }
+inline base operator - (base a, base b) { return base(a.x - b.x, a.y - b.y); }
+inline base operator * (base a, base b) { return base(a.x * b.x - a.y * b.y, a.x * b.y + a.y * b.x); }
+inline base conj(base a) { return base(a.x, -a.y); }
 
-ll mulmod(ll u, ll v, ll m) {
-  return ((u * v - (ll)((long double)u / m * v + 1e-8) * m) % m + m) % m; //don't know how tf this works
+int lim = 1;
+vector<base> roots = {{0, 0}, {1, 0}};
+vector<int> rev = {0, 1};
+
+void ensure_base(int p) {
+  if (p <= lim) return;
+  rev.resize(1 << p);
+  for (int i = 0; i < (1 << p); i++) rev[i] = (rev[i >> 1] >> 1) + ((i & 1)  <<  (p - 1));
+  roots.resize(1 << p);
+  while (lim < p) {
+    double angle = 2 * PI / (1 << (lim + 1));
+    for (int i = 1 << (lim - 1); i < (1 << lim); i++) {
+      roots[i << 1] = roots[i];
+      double angle_i = angle * (2 * i + 1 - (1 << lim));
+      roots[(i << 1) + 1] = base(cos(angle_i), sin(angle_i));
+    }
+    lim++;
+  }
 }
 
-ll bigmod (ll a, ll p, ll m) {
-  ll res = 1 % m;
-  ll x = a % m;
-  while (p) {
-    if (p & 1) res = (res * x) % m;
-    x = (x * x) % m;
-    p = p >> 1;
-  }
-  return res;
-}
-
-void ntt(vector<ll> & a, bool invert) {
-  int n = (int)a.size();
-
-  for (int i = 1, j = 0; i < n; ++i) {
-    int bit = n >> 1;
-    for (; j >= bit; bit >>= 1) j -= bit;
-    j += bit;
-    if (i < j) swap(a[i], a[j]);
-  }
-
-  for (int len = 2; len <= n; len <<= 1) {
-    ll wlen = (invert ? inv_root : root);
-    for (int i = len; i < limit; i <<= 1) wlen = (wlen * wlen) % mod;
-    for (int i = 0; i < n; i += len) {
-      ll w = 1;
-      for (int j = 0; j < len / 2; ++j) {
-        ll u = a[i + j], v = (a[i + j + len / 2] * w) % mod;
-        a[i + j] = u + v < mod ? u + v : u + v - mod;
-        a[i + j + len / 2] = u - v >= 0 ? u - v : u - v + mod;
-        w = (w * wlen) % mod;
+void fft(vector<base> &a, int n = -1) {
+  if (n == -1) n = a.size();
+  assert((n & (n - 1)) == 0);
+  int zeros = __builtin_ctz(n);
+  ensure_base(zeros);
+  int shift = lim - zeros;
+  for (int i = 0; i < n; i++) if (i < (rev[i] >> shift)) swap(a[i], a[rev[i] >> shift]);
+  for (int k = 1; k < n; k <<= 1) {
+    for (int i = 0; i < n; i += 2 * k) {
+      for (int j = 0; j < k; j++) {
+        base z = a[i + j + k] * roots[j + k];
+        a[i + j + k] = a[i + j] - z;
+        a[i + j] = a[i + j] + z;
       }
     }
   }
-  if (invert) {
-    ll inv_n = bigmod(n, mod - 2, mod);
-    for (int i = 0; i < n; ++i) a[i] = (a[i] * inv_n) % mod;
-  }
 }
 
-vector<ll> Mul(vector<ll>& a, vector<ll>& b) {
-  vector<ll> fa(a.begin(), a.end()), fb(b.begin(), b.end());
-  int n = 1;
-  while (n < max(a.size(), b.size()))  n <<= 1;
-  n <<= 1;
-  fa.resize(n), fb.resize(n);
-
-  ntt(fa, false), ntt(fb, false);
-  for (int i = 0; i < n; ++i) fa[i] = (fa[i] * fb[i]) % mod;
-  ntt(fa, true);
-
-  vector<ll> res;
-  res.resize(n);
-  for (int i = 0; i < n; ++i) res[i] = fa[i];
+//eq = 0: 4 FFTs in total
+//eq = 1: 3 FFTs in total
+vector<int> multiply(vector<int> &a, vector<int> &b, int eq = 0) {
+  int need = a.size() + b.size() - 1;
+  int p = 0;
+  while ((1 << p) < need) p++;
+  ensure_base(p);
+  int sz = 1 << p;
+  vector<base> A, B;
+  if (sz > (int)A.size()) A.resize(sz);
+  for (int i = 0; i < (int)a.size(); i++) {
+    int x = (a[i] % mod + mod) % mod;
+    A[i] = base(x & ((1 << 15) - 1), x >> 15);
+  }
+  fill(A.begin() + a.size(), A.begin() + sz, base{0, 0});
+  fft(A, sz);
+  if (sz > (int)B.size()) B.resize(sz);
+  if (eq) copy(A.begin(), A.begin() + sz, B.begin());
+  else {
+    for (int i = 0; i < (int)b.size(); i++) {
+      int x = (b[i] % mod + mod) % mod;
+      B[i] = base(x & ((1 << 15) - 1), x >> 15);
+    }
+    fill(B.begin() + b.size(), B.begin() + sz, base{0, 0});
+    fft(B, sz);
+  }
+  double ratio = 0.25 / sz;
+  base r2(0, -1), r3(ratio, 0), r4(0, -ratio), r5(0, 1);
+  for (int i = 0; i <= (sz >> 1); i++) {
+    int j = (sz - i) & (sz - 1);
+    base a1 = (A[i] + conj(A[j])), a2 = (A[i] - conj(A[j])) * r2;
+    base b1 = (B[i] + conj(B[j])) * r3, b2 = (B[i] - conj(B[j])) * r4;
+    if (i != j) {
+      base c1 = (A[j] + conj(A[i])), c2 = (A[j] - conj(A[i])) * r2;
+      base d1 = (B[j] + conj(B[i])) * r3, d2 = (B[j] - conj(B[i])) * r4;
+      A[i] = c1 * d1 + c2 * d2 * r5;
+      B[i] = c1 * d2 + c2 * d1;
+    }
+    A[j] = a1 * b1 + a2 * b2 * r5;
+    B[j] = a1 * b2 + a2 * b1;
+  }
+  fft(A, sz); fft(B, sz);
+  vector<int> res(need);
+  for (int i = 0; i < need; i++) {
+    long long aa = A[i].x + 0.5;
+    long long bb = B[i].x + 0.5;
+    long long cc = A[i].y + 0.5;
+    res[i] = (aa + ((bb % mod) << 15) + ((cc % mod) << 30)) % mod;
+  }
   return res;
+}
+
+vector<int> fastexpo(vector<int> &v, int p) {
+  vector<int> ret;
+  res.emplace_back(1);
+  while (p) {
+    if (p & 1) ret = multiply(res, v);
+    v = multiply(v, v, 1);
+    p >>= 1;
+  }
+  return ret;
 }
 
 int arr[MAX];

@@ -161,12 +161,13 @@ vector<LL> anyMod(const vector<LL> &a, const vector<LL> &b) {
   return ans;
 }
 
-vector<bool> fastexpo(vector<bool>v, int p) {
-  vector<bool>ret({1});
-  while (p > 0) {
-    if (p % 2 == 1) ret = multiply(ret, v);
-    p = p / 2;
+vector<int> fastexpo(vector<int> &v, int p) {
+  vector<int> ret;
+  ret.emplace_back(1);
+  while (p) {
+    if (p & 1) ret = multiply(ret, v);
     v = multiply(v, v);
+    p >>= 1;
   }
   return ret;
 }
